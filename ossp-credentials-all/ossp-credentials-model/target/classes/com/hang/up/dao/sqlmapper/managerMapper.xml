@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hang.up.dao.ManagerDao">
+
+    <select id="getUserByUserName"  parameterType="String" resultType="com.hang.up.model.User">
+        select * from user where state = 1 and userName = #{userName}
+    </select>
+
+    <insert id="insertHomeList" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into home (url,title,state,detail) values
+        <foreach collection="list" item="item" index="index" open="" close="" separator=",">
+            ( #{item.url},#{item.title},#{item.state},#{item.detail})
+        </foreach>
+    </insert>
+
+    <update id="updateHomeList" parameterType="java.util.List">
+          <foreach collection="list" item="item" index="index" open="" close=";" separator=";">
+                update home h
+                <set>
+                    h.url = #{item.url},
+                    h.title = #{item.title},
+                    h.detail = #{item.detail}
+                </set>
+                <where>
+                    h.id = #{item.id}
+                </where>
+            </foreach>
+    </update>
+
+    <select id="getHomeAll"  resultType="com.hang.up.model.Home">
+        select * from home where state = 1
+    </select>
+
+    <update id="deleteHomeById"  parameterType="int" >
+            update home h
+            <set>
+                h.state = 0
+            </set>
+            <where>
+                h.id = #{id}
+            </where>
+    </update>
+
+    <select id="findProductTotal" parameterType="map" resultType="int">
+        select count(id) total from product  WHERE state = 1
+        <if test="title!=null">
+            and title LIKE #{title}
+        </if>
+        <if test="imageId!=null">
+            and imageId ${imageId}
+        </if>
+    </select>
+
+    <select id="getProductList" parameterType="map" resultType="com.hang.up.model.Product">
+        select p.*,i.name as imageName,i.url as imageUrl from product p LEFT JOIN image i ON p.imageId = i.id
+        <where>
+            p.state = 1
+            <if test="title!=null">
+                and p.title LIKE #{title}
+            </if>
+            <if test="imageId!=null">
+                and p.imageId ${imageId}
+            </if>
+        </where>
+        ORDER BY updateTime DESC LIMIT ${firstIndex},${lastIndex}
+    </select>
+
+    <insert id="addImage" parameterType="com.hang.up.model.Image" useGeneratedKeys="true" keyProperty="id">
+        insert into image (name,url) values (#{name},#{url})
+    </insert>
+
+    <insert id="addProduct" parameterType="com.hang.up.model.Product" useGeneratedKeys="true" keyProperty="id">
+        insert into product (title,content,imageId,state,createTime,updateTime) values (#{title},#{content},#{imageId},#{state},#{createTime},#{updateTime})
+    </insert>
+
+    <update id="updateProduct" parameterType="com.hang.up.model.Product" >
+        update product
+        <set>
+            imageId = #{imageId},
+
+            <if test="title!=null">
+                title = #{title},
+            </if>
+            <if test="content!=null">
+                content = #{content},
+            </if>
+            <if test="updateTime!=null">
+                updateTime = #{updateTime},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <select id="getProductById" parameterType="int" resultType="com.hang.up.model.Product">
+        select p.*,i.name as imageName,i.url as imageUrl from product p LEFT JOIN image i ON p.imageId = i.id WHERE p.id = #{id}
+    </select>
+
+    <update id="deleteProduct"  parameterType="int" >
+        update product
+        <set>
+            state = 0
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <select id="findInformationTotal" parameterType="map" resultType="int">
+        select count(id) total from information  WHERE state = 1
+        <if test="title!=null">
+            and title LIKE #{title}
+        </if>
+        <if test="imageId!=null">
+            and imageId ${imageId}
+        </if>
+    </select>
+
+    <select id="getInformationList" parameterType="map" resultType="com.hang.up.model.Information">
+        select p.*,i.name as imageName,i.url as imageUrl from information p LEFT JOIN image i ON p.imageId = i.id
+        <where>
+            p.state = 1
+            <if test="title!=null">
+                and p.title LIKE #{title}
+            </if>
+            <if test="imageId!=null">
+                and p.imageId ${imageId}
+            </if>
+        </where>
+        ORDER BY updateTime DESC LIMIT ${firstIndex},${lastIndex}
+    </select>
+
+    <insert id="addInformation" parameterType="com.hang.up.model.Information" useGeneratedKeys="true" keyProperty="id">
+        insert into information (title,content,imageId,state,createTime,updateTime) values (#{title},#{content},#{imageId},#{state},#{createTime},#{updateTime})
+    </insert>
+
+    <update id="updateInformation" parameterType="com.hang.up.model.Information" >
+        update information
+        <set>
+            imageId = #{imageId},
+
+            <if test="title!=null">
+                title = #{title},
+            </if>
+            <if test="content!=null">
+                content = #{content},
+            </if>
+            <if test="updateTime!=null">
+                updateTime = #{updateTime},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <select id="getInformationById" parameterType="int" resultType="com.hang.up.model.Information">
+        select p.*,i.name as imageName,i.url as imageUrl from information p LEFT JOIN image i ON p.imageId = i.id WHERE p.id = #{id}
+    </select>
+
+    <update id="deleteInformation"  parameterType="int" >
+        update information
+        <set>
+            state = 0
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+
+    <update id="saveAboutUs"  parameterType="com.hang.up.model.AboutUs" >
+        update aboutUs
+        <set>
+            content = #{content},imageName = #{imageName},imageUrl = #{imageUrl}
+        </set>
+        <where>
+            id = 1
+        </where>
+    </update>
+
+    <select id="getAboutUs"  resultType="com.hang.up.model.AboutUs">
+        select * from aboutUs where id = 1
+    </select>
+
+    <update id="saveContactUs"  parameterType="com.hang.up.model.ContactUs" >
+        update contactUs
+        <set>
+            phone = #{phone},email = #{email},fax = #{fax},address = #{address}
+        </set>
+        <where>
+            id = 1
+        </where>
+    </update>
+
+    <select id="getContactUs"  resultType="com.hang.up.model.ContactUs">
+        select * from contactUs where id = 1
+    </select>
+
+    <insert id="saveMessage" parameterType="com.hang.up.model.Message" useGeneratedKeys="true" keyProperty="id">
+        insert into message (title,content,email,createTime) values (#{title},#{content},#{email},#{createTime})
+    </insert>
+
+    <select id="findMessageTotal" parameterType="map" resultType="int">
+        select count(id) total from message
+        <where>
+            <if test="title!=null">
+                and title LIKE #{title}
+            </if>
+        </where>
+    </select>
+
+    <select id="getMessageList" parameterType="map" resultType="com.hang.up.model.Message">
+        select * from message
+        <where>
+            <if test="title!=null">
+                and title LIKE #{title}
+            </if>
+        </where>
+        ORDER BY createTime DESC LIMIT ${firstIndex},${lastIndex}
+    </select>
+
+    <delete id="deleteMessage" parameterType="int">
+        delete from message where id = #{id}
+    </delete>
+
+</mapper>
